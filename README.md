@@ -1,4 +1,4 @@
-### Comparison between parallel and sequential
+## QSort: Comparison between parallel and sequential = 2.419
 
 
 | Try      | Sequential | Parallel     | Ratio  |
@@ -11,4 +11,16 @@
 | mean_sum | 841748 ms  | 347923.6 ms  | 2.419   |
 
 
-Sequential to Parallel = 2.419
+
+## BFS: Comparison between parallel and sequential = 2.341
+
+
+| Try      | Sequential | Parallel     | Ratio  |
+|----------|------------|--------------|---------|
+| 1        | 18174 ms  | 7603 ms    | 2.39   |
+| 2        | 17364 ms  | 7399 ms    | 2.347   |
+| 3        | 17633 ms  | 7429 ms    | 2.374   |
+| 4        | 16452 ms  | 7462 ms    | 2.205   |
+| 5        | 18124 ms  | 7586 ms    | 2.389   |
+| mean_sum | 17549.4 ms  | 7495.8 ms  | 2.341   |
+
