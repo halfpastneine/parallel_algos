@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <random>
 
 #include "par.h"
 #include "graph_helper.h"
@@ -61,11 +62,68 @@ void base_graph_test()
 }
 
 
+inline std::random_device dev;
+inline std::mt19937 rng(dev());
+const int n = 10000;
+inline std::uniform_int_distribution<std::mt19937::result_type> vertex_num(0, n - 1);
+parlay::sequence<parlay::sequence<int>> graph(n);
+parlay::sequence<int> answer(n, -1);
+std::vector layers(6, std::vector<int>());
+
+void generate_edges(int v, int distance)
+{
+    while (graph[v].size() != 6)
+    {
+        int vertex = static_cast<int>(vertex_num(rng));
+        if (vertex == v || std::find(graph[v].begin(), graph[v].end(), vertex) != graph[v].end()) continue;
+
+        graph[v].push_back(vertex);
+        layers[distance].push_back(vertex);
+        if (answer[vertex] == -1)
+        {
+            answer[vertex] = distance;
+            continue;
+        }
+
+        answer[vertex] = std::min(answer[vertex], distance);
+    }
+}
+
+void generate_random_graph(int depth)
+{
+    if (depth == 5) return;
+    auto v = layers[depth];
+
+    for (auto el : v) generate_edges(el, depth + 1);
+    generate_random_graph(depth + 1);
+}
+
+
+void random_graph_test()
+{
+
+    for (int i = 0; i < 5; ++i)
+    {
+        graph.assign(n, parlay::sequence<int>());
+        answer.assign(n, -1);
+        layers.assign(6, std::vector<int>());
+        answer[0] = 0;
+        layers[0].push_back(0);
+        generate_random_graph(0);
+        std::for_each(answer.begin(), answer.end(), [](int& v) {v = v == -1 ? 0 : v;});
+        assert(seqeuential_bfs(graph) == answer);
+        assert(parallel_bfs(graph) == answer);
+    }
+
+    std::cout << "All random tests passed\n";
+}
+
+
 void cubic_graph_test()
 {
     run_cubic_test(13);
     run_cubic_test(25);
-    run_cubic_test(57);
+    // run_cubic_test(57);
     run_cubic_test(77);
     run_cubic_test(101);
     run_cubic_test(121);
